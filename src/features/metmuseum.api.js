@@ -9,7 +9,6 @@ import {
 export const apiGetObjects = async params => {
   try {
     const res = await axios.get(parseApiRoute(routeGetObjects), { params });
-    console.log("I'm getting data", res);
     return res.data;
   } catch (error) {
     console.log(error);
