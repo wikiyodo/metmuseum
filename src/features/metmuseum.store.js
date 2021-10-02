@@ -4,6 +4,7 @@ import {
   apiGetObject,
   apiGetObjects
 } from "./metmuseum.api";
+import { ART_WORK_INTERVAL } from "../helpers/config";
 
 export const getObjects = createAsyncThunk(
   "museum/objects/get",
@@ -73,6 +74,7 @@ const initialState = {
   objects: [],
   objectsDetails: {},
   objectDepartments: [],
+  timer: 0,
   fetchingObjects: false,
   department: null,
   departmentObjects: {},
@@ -80,13 +82,26 @@ const initialState = {
   galleryQueueIndexes: [],
   galleryQueueHeadIndex: 0,
   galleryQueueTailIndex: 0,
-  selectedImages: []
+  selectedImages: [],
+  connectionFailed: false
 };
 
 export const museumSlice = createSlice({
   name: "museum",
   initialState,
   reducers: {
+    increment: state => {
+      if (state.connectionFailed) return;
+
+      if (state.timer == ART_WORK_INTERVAL - 1) state.timer = 0;
+      else state.timer += 1;
+    },
+    reset: state => {
+      state.timer = 0;
+    },
+    selectDepartment: (state, { payload }) => {
+      state.department = payload;
+    },
     addNewItem: (state, { payload: oldIndex }) => {
       let selectedIndex = null;
 
@@ -135,11 +150,13 @@ export const museumSlice = createSlice({
 
       // load first five items into the queue
       state.galleryQueueIndexes = payload.slice(0, 5);
+      state.connectionFailed = false;
 
       return state;
     },
     [getObject.fulfilled]: (state, { payload: { data, objectID } }) => {
       state.objectsDetails[`_${objectID}`] = data;
+      state.connectionFailed = false;
 
       return state;
     },
@@ -152,12 +169,18 @@ export const museumSlice = createSlice({
       state.departmentObjects = payload;
       state.fetchingObjects = false;
 
+      state.connectionFailed = false;
+
       return state;
     },
     [getObjects.rejected]: state => {
+      state.connectionFailed = true;
+
       return state;
     },
     [getObject.rejected]: state => {
+      state.connectionFailed = true;
+
       return state;
     }
   }
