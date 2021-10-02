@@ -11,7 +11,6 @@ export const apiGetObjects = async params => {
     const res = await axios.get(parseApiRoute(routeGetObjects), { params });
     return res.data;
   } catch (error) {
-    console.log(error);
     return {
       status: false
     };

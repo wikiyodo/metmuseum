@@ -95,7 +95,6 @@ function App() {
     }
 
     storeInterval = setInterval(() => dispatch(increment()), 1000);
-    console.log("wikwiwwkwiwkwiwk");
   };
 
   const index = galleryQueueIndexes[0];
